@@ -1,8 +1,8 @@
 const MongoClient = require('mongodb').MongoClient,
   _ = require('lodash'),
-  mongoUrl = process.env.MONGODB_URI || 'mongodb://localhost/test-mongo',
   when = require('when');
 
+let mongoUrl;
 let collectionName;
 let collection;
 let collectionPromise;
@@ -100,9 +100,14 @@ const remove = () => {
     })
 };
 
-module.exports = function(collection, indexArr){
-	collectionName = collection;
-	indexes = indexArr || [];
+//options:
+// url (mongo url format)
+// collection (collection name string)
+// indexes (array of strings to make indexes on)
+module.exports = function(options){
+	mongoUrl = options.url || 'mongodb://localhost/test-mongo';
+	collectionName = options.collection || 'default-collection';
+	indexes = options.indexArr || [];
 	return {
   		upsert,
   		get,
