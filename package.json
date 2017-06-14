@@ -1,0 +1,19 @@
+{
+  "name": "mongo-module",
+  "version": "1.0.0",
+  "description": "basic node wrapper around mongo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bradwbradw/mongo-module.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bradwbradw/mongo-module/issues"
+  },
+  "homepage": "https://github.com/bradwbradw/mongo-module#readme"
+}
