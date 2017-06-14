@@ -106,7 +106,7 @@ const remove = () => {
 // indexes (array of strings to make indexes on)
 module.exports = function(options){
 	mongoUrl = options.url || 'mongodb://localhost/test-mongo';
-	collectionName = options.collection || 'default-collection';
+	collectionName = options.collection;
 	indexes = options.indexArr || [];
 	return {
   		upsert,
