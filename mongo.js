@@ -3,6 +3,7 @@ const MongoClient = require('mongodb').MongoClient,
   when = require('when');
 
 let mongoUrl;
+let dbName;
 let collectionName;
 let collection;
 let collectionPromise;
@@ -13,10 +14,10 @@ function mongo() {
   if (!collection && !collectionPromise) {
     console.log('creating new mongo');
 
-    collectionPromise = MongoClient.connect(mongoUrl)
+    collectionPromise = MongoClient.connect(mongoUrl, {useNewUrlParser:true})
       .then(mongoConnection => {
         console.log('getting collection '+collectionName);
-        collection = mongoConnection.collection(collectionName);
+        collection = mongoConnection.db(dbName).collection(collectionName);
         return collection;
       })
       .then(collection => {
@@ -108,6 +109,7 @@ module.exports = function(options){
 	mongoUrl = options.url || 'mongodb://localhost/test-mongo';
 	collectionName = options.collection || 'default-collection';
 	indexes = options.indexArr || [];
+	dbName = options.db || 'test-db'
 	return {
   		upsert,
   		get,
