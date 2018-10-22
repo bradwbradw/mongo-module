@@ -79,7 +79,7 @@ after((done) =>  {
   // runs after all tests in this block
   let MongoClient = require('mongodb').MongoClient;
 
-  MongoClient.connect(options.url)
+  MongoClient.connect(options.url, {useNewUrlParser:true })
     .then(mongoConnection => {
       return mongoConnection.db(options.db).dropDatabase();
     })

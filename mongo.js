@@ -17,7 +17,7 @@ function mongo() {
   if (!collection && !collectionPromise) {
     console.log('creating new mongo');
 
-    collectionPromise = MongoClient.connect(options.url)
+    collectionPromise = MongoClient.connect(options.url, {useNewUrlParser:true})
       .then(mongoConnection => {
         console.log('getting collection '+options.collection);
         collection = mongoConnection.db(options.db).collection(options.collection);
