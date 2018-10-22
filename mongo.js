@@ -2,26 +2,29 @@ const MongoClient = require('mongodb').MongoClient,
   _ = require('lodash'),
   when = require('when');
 
-let mongoUrl;
-let dbName;
-let collectionName;
+// defaults
+const options = {
+  url: 'mongodb://localhost',
+  collection: 'default-collection',
+  indexes:[],
+  db:'test-db'
+};
+
 let collection;
 let collectionPromise;
-let indexes = [
-];
 
 function mongo() {
   if (!collection && !collectionPromise) {
     console.log('creating new mongo');
 
-    collectionPromise = MongoClient.connect(mongoUrl, {useNewUrlParser:true})
+    collectionPromise = MongoClient.connect(options.url)
       .then(mongoConnection => {
-        console.log('getting collection '+collectionName);
-        collection = mongoConnection.db(dbName).collection(collectionName);
+        console.log('getting collection '+options.collection);
+        collection = mongoConnection.db(options.db).collection(options.collection);
         return collection;
       })
       .then(collection => {
-        return _.map(indexes, name => {
+        return _.map(options.indexes, name => {
           indexObj = {};
           indexObj[name] = 1;
           return collection.createIndex(indexObj);
@@ -54,8 +57,8 @@ const upsert = record => {
       return collection.insertOne(record)
         .catch((err) => {
           if (err.code === 11000) {
-//            console.log(`duplicate detected. updating ${record._id}`);
-            return collection.findOneAndUpdate({_id: record._id}, record)
+            console.log(`duplicate detected. updating ${record._id}`);
+            return collection.findOneAndReplace({_id: record._id}, record)
           } else {
             console.error('insertOne error', err);
             return when.reject(err);
@@ -101,15 +104,10 @@ const remove = () => {
     })
 };
 
-//options:
-// url (mongo url format)
-// collection (collection name string)
-// indexes (array of strings to make indexes on)
-module.exports = function(options){
-	mongoUrl = options.url || 'mongodb://localhost/test-mongo';
-	collectionName = options.collection || 'default-collection';
-	indexes = options.indexArr || [];
-	dbName = options.db || 'test-db'
+module.exports = function(userProvidedOptions){
+
+  _.extend(options, userProvidedOptions);
+
 	return {
   		upsert,
   		get,
@@ -117,4 +115,4 @@ module.exports = function(options){
   		remove,
   		count
 	};
-}
+};
