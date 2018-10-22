@@ -10,6 +10,8 @@ const options = {
   db:'test-db'
 };
 
+console.log("am connecting to ", options.url);
+
 let collection;
 let collectionPromise;
 
@@ -104,6 +106,14 @@ const remove = () => {
     })
 };
 
+const collection = () => {
+  return mongo();
+};
+
+const collectionSync = () => {
+  return collection;
+};
+
 module.exports = function(userProvidedOptions){
 
   _.extend(options, userProvidedOptions);
@@ -113,6 +123,8 @@ module.exports = function(userProvidedOptions){
   		get,
   		getById,
   		remove,
-  		count
+  		count,
+      collection,
+      collectionSync
 	};
 };
