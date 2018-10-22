@@ -106,7 +106,7 @@ const remove = () => {
     })
 };
 
-const collection = () => {
+const collectionAsync = () => {
   return mongo();
 };
 
@@ -124,7 +124,7 @@ module.exports = function(userProvidedOptions){
   		getById,
   		remove,
   		count,
-      collection,
+      collectionAsync,
       collectionSync
 	};
 };
