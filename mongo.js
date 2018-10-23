@@ -59,7 +59,7 @@ const upsert = record => {
       return collection.insertOne(record)
         .catch((err) => {
           if (err.code === 11000) {
-            console.log(`duplicate detected. updating ${record._id}`);
+          //  console.log(`duplicate detected. updating ${record._id}`);
             return collection.findOneAndReplace({_id: record._id}, record)
           } else {
             console.error('insertOne error', err);
