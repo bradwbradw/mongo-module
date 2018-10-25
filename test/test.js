@@ -92,7 +92,7 @@ describe('db operations', () => {
 
           db = new mongoModule({
             url: 'mongodb://localhost',
-            collection: 'collection',
+            collection: 'collection1',
             indexes: [],
             db: dbName
           });
@@ -107,7 +107,7 @@ describe('db operations', () => {
         });
     });
 
-    it.only('should insert new record into new collection', (done) => {
+    it('should insert new record into new collection', (done) => {
       let err;
 
       db.upsert({
@@ -120,27 +120,28 @@ describe('db operations', () => {
             person: "cal"
           });
         })
-        .then(db.get)
-        .then(results => {
-          assert.equal(_.size(results), 1);
-          console.log('11111')
+        .then(() => {
+          return db.get();
         })
-        .then(db2.get)
         .then(results => {
-          console.log('33333')
+          console.log('collection1', results);
+          assert.equal(_.size(results), 1);
+        })
+        .then(() => {
+          return  db2.get();
+        })
+        .then(results => {
+          console.log('collection2', results);
           assert.equal(_.size(results), 1);
         })
         .catch(e => {
-          console.log('44444')
           err = e;
           return Promise.resolve();
         })
         .then(() => {
-          console.log('5555555')
           return dropDB();
         })
         .then(() => {
-          console.log('666666')
           done(err)
         });
     });
