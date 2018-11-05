@@ -16,8 +16,6 @@ module.exports = function (userProvidedOptions) {
 
   _.extend(options, userProvidedOptions);
 
-  console.log("mongoModule connecting to ", options.url);
-
   let collection;
   let collectionPromise;
 
@@ -27,7 +25,7 @@ module.exports = function (userProvidedOptions) {
     } else if (mongoConnectionPromise){
       return mongoConnectionPromise
     } else {
-      console.log('creating new mongo connection');
+      console.log('creating new mongo connection', options.url);
       mongoConnectionPromise = MongoClient.connect(options.url, {useNewUrlParser: true});
       return mongoConnectionPromise;
     }
