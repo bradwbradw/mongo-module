@@ -4,7 +4,8 @@
   "description": "basic node wrapper around mongo",
   "main": "index.js",
   "scripts": {
-    "test":  "nodemon --watch . --exec 'mocha ./test/test.js || true'"
+    "test-debug": "mocha --inspect-brk --watch",
+    "test": "mocha --watch"
   },
   "repository": {
     "type": "git",

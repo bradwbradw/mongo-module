@@ -1,5 +1,5 @@
 const _ = require('lodash');
-
+const when = require('when');
 
 const mongoModule = require('.././mongo.js');
 
@@ -33,16 +33,23 @@ let options = {
 };
 
 before(() => {
+  console.log("set up test db ", options);
   db = mongoModule(options);
 });
+
+function newCollectionForTesting(name) {
+  return mongoModule(_.extend(_.cloneDeep(options)), {
+    collection: name || _.random(0, 1000000000)
+  })
+}
 
 describe('db operations', () => {
 
   describe('inserting one document', () => {
 
     before(done => {
-
-      db.upsert(testDocument).then(() => done())
+      console.log("inserting test tocument", testDocument);
+      db.upsert([testDocument]).then(() => done())
     });
 
     it('should have been inserted', done => {
@@ -56,11 +63,12 @@ describe('db operations', () => {
 
     it('upsert should update the doc', done => {
 
-      db.upsert({
+      db.upsert([{
         id: testDocument.id,
         person: "davey"
-      })
+      }])
         .then(() => {
+          debugger;
           return db.getById(testDocument.id);
         })
         .then(result => {
@@ -71,7 +79,7 @@ describe('db operations', () => {
         })
         .then(count => {
           assert.equal(count, 1);
-          return db.upsert(testDocument);
+          return db.upsert([testDocument]);
         })
         .then(() => {
 
@@ -110,15 +118,15 @@ describe('db operations', () => {
     it('should insert new record into new collection', (done) => {
       let err;
 
-      db.upsert({
+      db.upsert([{
         id: 22,
         person: "tuck"
-      })
+      }])
         .then(() => {
-          return db2.upsert({
+          return db2.upsert([{
             id: 33,
             person: "cal"
-          });
+          }]);
         })
         .then(() => {
           return db.get();
@@ -128,7 +136,7 @@ describe('db operations', () => {
           assert.equal(_.size(results), 1);
         })
         .then(() => {
-          return  db2.get();
+          return db2.get();
         })
         .then(results => {
           console.log('collection2', results);
@@ -145,6 +153,56 @@ describe('db operations', () => {
           done(err)
         });
     });
+
+    it('should do bulk upsert', (done) => {
+
+      let db = newCollectionForTesting();
+
+      when.all([
+        db.upsert([{
+          id: 12,
+          name: 'fred'
+        }]),
+        db.upsert([
+          {
+            id: 13,
+            name: 'john'
+          }, {
+            id: 14,
+            name: 'ash'
+          }
+        ]),
+      ])
+        .then(() => {
+          return db.upsert([
+            {
+              id: 12,
+              name: 'new fred'
+            },
+            {
+              id: 13,
+              name: 'new john'
+            },
+            {
+              id: 15,
+              name: 'new person danny'
+            }
+          ])
+        })
+        .then(() => {
+          return db.get()
+        })
+        .then(results => {
+          assert.deepEqual(results, [
+            {id: 12, name: 'new fred'},
+            {id: 13, name: 'new john'},
+            {id: 14, name: 'ash'},
+            {id: 15, name: 'new person danny'}
+          ]);
+          done()
+        })
+        .catch(done)
+    })
   })
 
 });

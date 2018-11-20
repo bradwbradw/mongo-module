@@ -64,28 +64,51 @@ module.exports = function (userProvidedOptions) {
     }
   }
 
-  const upsert = record => {
-    if (record.id) {
-      record._id = record.id;
-      record = _.omit(record, 'id');
-    }
+  const upsert = recordsArr => {
+    let ids = [];
+    let records = _.map(recordsArr, record => {
+      if (record.id) {
+        record._id = record.id;
+        ids = _.concat(ids, record._id);
+        return _.omit(record, 'id');
+      } else {
+        return record;
+      }
+    });
+
     return mongo()
       .then(collection => {
-        return collection.insertOne(record)
-          .catch((err) => {
+        return collection.insertMany(records, {ordered:false})
+          .catch((err, result) => {
             if (err.code === 11000) {
-              //  console.log(`duplicate detected. updating ${record._id}`);
-              return collection.findOneAndReplace({_id: record._id}, record)
+              console.log('there was a duplicate'); //TODO remove me
+              return when.resolve(result);
             } else {
               console.error('insertOne error', err);
               return when.reject(err);
             }
           })
-      })
-      .catch(err => {
-        console.error('error connecting to mongo', err);
+          .then(result => {
+            console.log({resulty: result});
 
-      })
+            let insertedIDs = _.values(_.get(result, 'insertedIds', {}));
+            let updateIDs = _.filter(ids, id => {
+              return !_.includes(insertedIDs, id);
+            });
+
+            let updateRecords = _.map(updateIDs, id => _.find(records, {_id: id}));
+
+            console.log({updateRecords});
+            return when.map(updateRecords, r => {
+              console.log('replacing',r);
+              return collection.replaceOne({_id: r._id}, r)
+                .catch(err => {
+                  console.log('replace err', err);
+                });
+            });
+          })
+
+      });
   };
 
   const get = query => {
