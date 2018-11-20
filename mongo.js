@@ -81,7 +81,6 @@ module.exports = function (userProvidedOptions) {
         return collection.insertMany(records, {ordered:false})
           .catch((err, result) => {
             if (err.code === 11000) {
-              console.log('there was a duplicate'); //TODO remove me
               return when.resolve(result);
             } else {
               console.error('insertOne error', err);
