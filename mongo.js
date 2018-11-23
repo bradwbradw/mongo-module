@@ -88,7 +88,7 @@ module.exports = function (userProvidedOptions) {
             }
           })
           .then(result => {
-            console.log({resulty: result});
+            //console.log({resulty: result});
 
             let insertedIDs = _.values(_.get(result, 'insertedIds', {}));
             let updateIDs = _.filter(ids, id => {
@@ -97,13 +97,10 @@ module.exports = function (userProvidedOptions) {
 
             let updateRecords = _.map(updateIDs, id => _.find(records, {_id: id}));
 
-            console.log({updateRecords});
+//            console.log({updateRecords});
             return when.map(updateRecords, r => {
-              console.log('replacing',r);
+  //            console.log('replacing',r);
               return collection.replaceOne({_id: r._id}, r)
-                .catch(err => {
-                  console.log('replace err', err);
-                });
             });
           })
 
@@ -153,6 +150,7 @@ module.exports = function (userProvidedOptions) {
 
 
 
+  // noinspection JSUnusedGlobalSymbols
   return {
     upsert,
     get,
