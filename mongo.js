@@ -22,7 +22,7 @@ module.exports = function (userProvidedOptions) {
   function connection() {
     if (mongoConnection) {
       return when.resolve(mongoConnection)
-    } else if (mongoConnectionPromise){
+    } else if (mongoConnectionPromise) {
       return mongoConnectionPromise
     } else {
       console.log('creating new mongo connection', options.url);
@@ -65,6 +65,10 @@ module.exports = function (userProvidedOptions) {
   }
 
   const upsert = recordsArr => {
+    if (!_.isArray(recordsArr)) {
+      return when.reject("please pass in an array of records");
+    }
+
     let ids = [];
     let records = _.map(recordsArr, record => {
       if (record.id) {
@@ -78,7 +82,7 @@ module.exports = function (userProvidedOptions) {
 
     return mongo()
       .then(collection => {
-        return collection.insertMany(records, {ordered:false})
+        return collection.insertMany(records, {ordered: false})
           .catch((err, result) => {
             if (err.code === 11000) {
               return when.resolve(result);
@@ -99,7 +103,7 @@ module.exports = function (userProvidedOptions) {
 
 //            console.log({updateRecords});
             return when.map(updateRecords, r => {
-  //            console.log('replacing',r);
+              //            console.log('replacing',r);
               return collection.replaceOne({_id: r._id}, r)
             });
           })
@@ -147,7 +151,6 @@ module.exports = function (userProvidedOptions) {
   const collectionSync = () => {
     return collection;
   };
-
 
 
   // noinspection JSUnusedGlobalSymbols
